@@ -128,7 +128,7 @@ if __name__ == '__main__':
 
     clickButtonShowShedule()
 
-    sleep(100000)
+    sleep(200000)
 
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
