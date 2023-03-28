@@ -5,11 +5,14 @@ from typing import Any, Optional
 # JSON всех факультетов
 URL_FACULTIES = "https://intime.tsu.ru/api/web/v1/faculties"
 
+# Название факультета/института
+current_faculty = "Институт прикладной математики и компьютерных наук"
+
 
 # HTTP запрос к TSU API
 class HttpRequest:
     # Отправка запроса
-    def _request(self, method: str, url: str) -> list[dict[str, Any]]:
+    def request(self, method: str, url: str) -> list[dict[str, Any]]:
         response = requests.request(
             method=method,
             url=url
@@ -37,21 +40,29 @@ class JsonExtractor:
         self.http_request = HttpRequest()
 
     # Ссылка на список всех групп выбранного факультета
-    def group_url(self, faculty_id: str) -> str:
+    def group_url(self, faculty_name: str) -> str:
+        faculty_id = self.get_faculty_id(faculty_name)
         url_group = f"{URL_FACULTIES}/{faculty_id}/groups"
         return url_group
 
     # Получение ID факультета для дальнейшего запроса к списку групп
     # todo: compare condition with the entered faculty name
-    def get_faculty_id(self):
-        list_of_faculties = self.http_request._request("GET", URL_FACULTIES)
+    def get_faculty_id(self, faculty_name: str) -> str:
+        list_of_faculties = self.http_request.request("GET", URL_FACULTIES)
         for faculty in list_of_faculties:
             # Пример для этого факультета, нужно добавить входные данные
-            if faculty.get("name") == "Автономная образовательная программа TISP":
+            if faculty.get("name") == faculty_name:
                 faculty_id = faculty.get("id")
-                print(faculty_id)
+                return faculty_id
+
+    # Запрос списка групп
+    def get_groups_list(self):
+        url_group = self.group_url(faculty_name=current_faculty)
+        list_of_groups = self.http_request.request("GET", url_group)
+        return list_of_groups
 
 
 if __name__ == '__main__':
     x = JsonExtractor()
-    x.get_faculty_id()
+    print(x.get_groups_list())
+
