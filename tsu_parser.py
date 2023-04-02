@@ -1,9 +1,13 @@
 import requests
 from typing import Any, Optional
+import datetime
 
 
 # JSON всех факультетов
 URL_FACULTIES = "https://intime.tsu.ru/api/web/v1/faculties"
+
+# JSON расписания для выбранной группы
+URL_SCHEDULE = "https://intime.tsu.ru/api/web/v1/schedule/group"
 
 # Название факультета/института
 current_faculty = "Институт прикладной математики и компьютерных наук"
@@ -12,11 +16,11 @@ current_faculty = "Институт прикладной математики и
 # HTTP запрос к TSU API
 class HttpRequest:
     # Отправка запроса
-    def request(self, method: str, url: str) -> list[dict[str, Any]]:
+    def send_request(self, method: str, url: str, params=None) -> list[dict[str, Any]]:
         response = requests.request(
             method=method,
-            url=url
-            # params=params
+            url=url,
+            params=params
         )
         return self.__check_response(response)
 
@@ -33,36 +37,71 @@ class HttpRequest:
             raise Exception(error_message)
 
 
-# Обработка JSON файла после выполнения запроса
-# todo: Think about name of class
-class JsonExtractor:
+# Получение даты для выполнения запроса к API и получения расписания группы
+class Date:
     def __init__(self):
+        self.today = datetime.date.today()
+        self.weekday = self.today.weekday()
+
+    def date_from(self) -> datetime.date:
+        return self.today - datetime.timedelta(days=self.weekday)
+
+    def date_to(self) -> datetime.date:
+        return self.date_from() + datetime.timedelta(days=5)
+
+
+# Обработка JSON файла после выполнения запроса
+class ScheduleExtractor:
+    def __init__(self, faculty, group_name):
         self.http_request = HttpRequest()
+        self.date = Date()
+        self.faculty = faculty
+        self.group_name = group_name
 
     # Ссылка на список всех групп выбранного факультета
-    def group_url(self, faculty_name: str) -> str:
-        faculty_id = self.get_faculty_id(faculty_name)
+    def all_groups(self) -> str:
+        faculty_id = self.get_faculty_id()
         url_group = f"{URL_FACULTIES}/{faculty_id}/groups"
         return url_group
 
     # Получение ID факультета для дальнейшего запроса к списку групп
-    # todo: compare condition with the entered faculty name
-    def get_faculty_id(self, faculty_name: str) -> str:
-        list_of_faculties = self.http_request.request("GET", URL_FACULTIES)
+    def get_faculty_id(self) -> Optional[str]:
+        list_of_faculties = self.http_request.send_request("GET", URL_FACULTIES)
         for faculty in list_of_faculties:
             # Пример для этого факультета, нужно добавить входные данные
-            if faculty.get("name") == faculty_name:
-                faculty_id = faculty.get("id")
-                return faculty_id
+            if faculty.get("name") == self.faculty:
+                return faculty.get("id")
+        else:
+            error = f"The {self.faculty} faculty wasn't found"
+            raise Exception(error)
 
     # Запрос списка групп
-    def get_groups_list(self):
-        url_group = self.group_url(faculty_name=current_faculty)
-        list_of_groups = self.http_request.request("GET", url_group)
+    def get_groups_list(self) -> list[dict[str, Any]]:
+        url_group = self.all_groups()
+        list_of_groups = self.http_request.send_request("GET", url_group)
         return list_of_groups
+
+    # Поиск id группы по номеру
+    def get_group_id(self) -> Optional[str]:
+        groups_list = self.get_groups_list()
+        for group in groups_list:
+            if group.get("name") == self.group_name:
+                return group.get("id")
+        else:
+            error = f"The {self.group_name} group wasn't found"
+            raise Exception(error)
+
+    # Запрос расписания для конкретной группы
+    def get_schedule(self) -> list[dict[str, Any]]:
+        params = {
+            "id": self.get_group_id(),
+            "dateFrom": self.date.date_from(),
+            "dateTo": self.date.date_to()
+        }
+        schedule_request = self.http_request.send_request("GET", URL_SCHEDULE, params=params)
+        return schedule_request
 
 
 if __name__ == '__main__':
-    x = JsonExtractor()
-    print(x.get_groups_list())
-
+    schedule = ScheduleExtractor(current_faculty, "932209")
+    print(schedule.get_schedule())
