@@ -2,15 +2,11 @@ import requests
 from typing import Any, Optional
 import datetime
 
-
 # JSON всех факультетов
 URL_FACULTIES = "https://intime.tsu.ru/api/web/v1/faculties"
 
 # JSON расписания для выбранной группы
 URL_SCHEDULE = "https://intime.tsu.ru/api/web/v1/schedule/group"
-
-# Название факультета/института
-current_faculty = "Институт прикладной математики и компьютерных наук"
 
 
 # HTTP запрос к TSU API
@@ -39,12 +35,14 @@ class HttpRequest:
 
 # Получение даты для выполнения запроса к API и получения расписания группы
 class Date:
-    def __init__(self):
-        self.today = datetime.date.today()
-        self.weekday = self.today.weekday()
+    def __init__(self, date):
+        if date is None:
+            self.day = datetime.date.today()
+        else:
+            self.day = datetime.datetime.strptime(date, '%d.%m.%Y').date()
 
     def date_from(self) -> datetime.date:
-        return self.today - datetime.timedelta(days=self.weekday)
+        return self.day - datetime.timedelta(days=self.day.weekday())
 
     def date_to(self) -> datetime.date:
         return self.date_from() + datetime.timedelta(days=5)
@@ -52,9 +50,10 @@ class Date:
 
 # Обработка JSON файла после выполнения запроса
 class ScheduleExtractor:
-    def __init__(self, faculty, group_name):
+    def __init__(self, faculty, group_name, date=None):
         self.http_request = HttpRequest()
-        self.date = Date()
+        self.date = date
+        self.date_obj = Date(self.date)
         self.faculty = faculty
         self.group_name = group_name
 
@@ -91,17 +90,24 @@ class ScheduleExtractor:
             error = f"The {self.group_name} group wasn't found"
             raise Exception(error)
 
-    # Запрос расписания для конкретной группы
+    # Запрос расписания для конкретной группы на сегодня
     def get_schedule(self) -> list[dict[str, Any]]:
         params = {
             "id": self.get_group_id(),
-            "dateFrom": self.date.date_from(),
-            "dateTo": self.date.date_to()
+            "dateFrom": self.date_obj.date_from(),
+            "dateTo": self.date_obj.date_to()
         }
         schedule_request = self.http_request.send_request("GET", URL_SCHEDULE, params=params)
         return schedule_request
 
+    # print расписания
+    def print_schedule(self):
+        print(self.get_schedule())
+
 
 if __name__ == '__main__':
-    schedule = ScheduleExtractor(current_faculty, "932209")
-    print(schedule.get_schedule())
+    current_faculty = "Институт прикладной математики и компьютерных наук"
+    current_group = "932209"
+    selected_day = "01.05.2023"
+    schedule = ScheduleExtractor(current_faculty, current_group, selected_day)
+    schedule.print_schedule()
