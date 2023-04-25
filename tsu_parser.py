@@ -1,6 +1,8 @@
 import requests
 from typing import Any, Optional
 import datetime
+import json
+from transliterate import translit
 
 # JSON всех факультетов
 URL_FACULTIES = "https://intime.tsu.ru/api/web/v1/faculties"
@@ -104,10 +106,18 @@ class ScheduleExtractor:
     def print_schedule(self):
         print(self.get_schedule())
 
+    # Сохранение в JSON
+    def save_to_json(self):
+        schedule_list = self.get_schedule()
+        faculty_label_list = self.faculty.split()
+        faculty_translited = translit("_".join(faculty_label_list), language_code="ru", reversed=True)
+        with open(f"{faculty_translited}_{self.group_name}.json", "w") as file:
+            json.dump(schedule_list, file)
+
 
 if __name__ == '__main__':
     current_faculty = "Институт прикладной математики и компьютерных наук"
     current_group = "932209"
     selected_day = "01.05.2023"
     schedule = ScheduleExtractor(current_faculty, current_group, selected_day)
-    schedule.print_schedule()
+    schedule.save_to_json()
