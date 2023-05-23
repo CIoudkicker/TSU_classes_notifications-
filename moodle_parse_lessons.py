@@ -159,5 +159,5 @@ if __name__ == '__main__':
     #         moodleParseLessons.StartWaitLesson()
     #         startOnce = False
     #     sleep(2)
-    # print("end")
+    print("end")
     sleep(100000)
