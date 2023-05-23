@@ -128,7 +128,7 @@ class ScheduleExtractor:
     def save_to_json(self):
         self.request_schedule()
         faculty_label_list = self.faculty.split()
-        faculty_translited = translit("_".join(faculty_label_list), language_code="ru", reversed=True)
+        faculty_translited = "schedule_" + translit("_".join(faculty_label_list), language_code="ru", reversed=True)
         pure_faculty_translited = "pure_" + faculty_translited
         with open(f"{faculty_translited}_{self.group_name}.json", "w") as file:
             json.dump(self.schedule_list, file, ensure_ascii=False)

@@ -6,6 +6,7 @@ from time import time
 from selenium.common import exceptions as SeleniumExceptions
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
+import threading
 
 def findXPathOnPage(driver = None):
     def myDecorator(function_to_decorate):
@@ -43,9 +44,14 @@ def findXPathOnPage(driver = None):
 class WorkWithSite:
 
     def __init__(self):
-        self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
         self.path = "https://moodle.tsu.ru/login/index.php"
+
+    def startBrowser(self):
+        self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
         self.driver.get(self.path)
+
+    def quitBrowser(self):
+        self.driver.quit()
 
     # Функция которая нахожит кнопку "Войти через ТГУ аккаунт" при входе на сайт
     @findXPathOnPage()
@@ -58,9 +64,11 @@ class WorkWithSite:
 
 if __name__ == '__main__':
     signIn = WorkWithSite()
+    signIn.startBrowser()
     signIn.clickOn('//*[@id="login_url"]')
     signIn.setText('//*[@id="Email"]', "") # Логин или email
     signIn.setText('//*[@id="Password"]', "") # Пароль
     signIn.clickOn('//*[@id="loginForm"]/form/div[3]/input[2]')
+
 
     sleep(100000)
