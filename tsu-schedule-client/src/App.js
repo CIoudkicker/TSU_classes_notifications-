@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Login from './components/Login';
 import ScheduleTable from './components/scheduleTable';
+import Profile from './components/profile';
 
 function App() {
   return (
@@ -10,6 +11,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/schedule" element={<ScheduleTable />} />
+		  <Route path="/profile" element={<Profile />} />
         </Routes>
       </div>
     </Router>

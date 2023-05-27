@@ -2,8 +2,10 @@
 import React, { useState } from 'react';
 import { Container, Row, Col, Table, Button, Modal } from 'react-bootstrap';
 import scheduleData from './scheduleData';
+import { useNavigate } from 'react-router';
 
 const ScheduleTable = () => {
+  const navigate = useNavigate();
   // Хук для отоборажения окошка с дополнительной информацией о паре
   const [show, setShow] = useState(false);
   const [lesson, setLesson] = useState(null);
@@ -13,6 +15,10 @@ const ScheduleTable = () => {
   const handleShow = (lesson) => {
     setLesson(lesson);
     setShow(true);
+  };
+  
+  const navigateToProfile = () => {
+    navigate('/profile');
   };
 
   // Время начала и конца пар
@@ -30,6 +36,11 @@ const ScheduleTable = () => {
 
   return (
     <Container>
+	  <Row>
+        <Col>
+          <Button onClick={() => navigateToProfile()}></Button>
+        </Col>
+      </Row>
       <Row>
         <Col>
           <h1>Weekly Schedule</h1>
