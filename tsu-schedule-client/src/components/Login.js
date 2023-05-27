@@ -12,6 +12,7 @@ function Login() {
     e.preventDefault();
     if (username === 'admin' && password === 'password') {
       // processing authorization
+	  // processing authorization
       navigate('/schedule');
     } else {
       setError('Неверное имя пользователя или пароль');
