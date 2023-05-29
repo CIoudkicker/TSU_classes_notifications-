@@ -38,7 +38,7 @@ const ScheduleTable = () => {
     <Container>
 	  <Row>
         <Col>
-          <Button onClick={() => navigateToProfile()}></Button>
+          <Button onClick={() => navigateToProfile()}> Профиль </Button>
         </Col>
       </Row>
       <Row>
