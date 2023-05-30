@@ -23,7 +23,10 @@ class WorkWithSite:
         field.send_keys(text)
 
     def scrape_links(self):
-        element = self.driver.find_elements(By.XPATH, '//*[@id="inst1025821"]/div[2]/div[2]/table/tbody')
+
+        element = list()
+        while len(element) == 0:
+            element = self.driver.find_elements(By.XPATH, '//*[@id="inst1025821"]/div[2]/div[2]/table/tbody')
 
         links = { }
 
@@ -50,6 +53,6 @@ if __name__ == '__main__':
     signIn.setText('//*[@id="Password"]', "23347835Qq")  # Пароль
     signIn.clickOn('//*[@id="loginForm"]/form/div[3]/input[2]')
 
-    time.sleep(30)
+    # time.sleep(30)
 
     signIn.scrape_links()
