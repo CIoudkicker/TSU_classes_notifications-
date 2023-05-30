@@ -1,7 +1,7 @@
 
 const jwt= require('jsonwebtoken')
 
-const { options } = require("pg/lib/defaults")
+// const { options } = require("pg/lib/defaults")
 
 /*основной задачей этого блока является проверка токенов на валидность изменять только в случае крайней необходимости*/
 module.exports = function(req,res,next)
