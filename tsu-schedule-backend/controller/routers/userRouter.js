@@ -12,6 +12,7 @@ const checkrole = require('../middleware/checkRoleMiddleware')
 
 //router.post('/registration',userController.registration)
 router.post('/login',userController.login)
+router.post('/login_pseudo',userController.login_pseudo)
 //router.get('/auth',authMiddleware,userController.check)
 //router.post('/addClass',checkrole('ADMIN'),userController.addClass)//нужна админам для добавления классов пользователю
 //router.post('/getClass',checkrole('ADMIN'),userController.getClass)// нужна чтобы видеть какие классы за кем закреплены

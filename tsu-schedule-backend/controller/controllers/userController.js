@@ -10,12 +10,29 @@ const kafka = new Kafka({
 });
 
 const producer = kafka.producer();
-
+const consumer = kafka.consumer();
 //const {User, Class}= require ('../models/model')
 const generateJwt=(id,email,role)=>{
     return jwt.sign({id , email, role},process.env.jwt_key,{expiresIn: '24h'})/* экспайрс ин, это срок годности токена, чтобы если токен украли, он устарел за этот срок*/
 
 }
+const consumeMessage = async (topic_sub) => {
+  try { await consumer.connect();
+        await consumer.subscribe({ topic: topic_sub, fromBeginning: true });
+        await consumer.run({
+          eachMessage: async ({ topic, partition, message }) => {
+            console.log(`Received message: ${message.value.toString()} from topic ${topic}`);
+            // Process the message as needed
+            return message;
+          },
+        });
+
+  } catch (error) {
+    console.error('Error consuming message:', error);
+  } finally {
+    await consumer.disconnect();
+  }
+};
 
 const produceMessage = async (credentials) => {
     try {
@@ -46,40 +63,46 @@ class UserController {
 
 
 
-    async registration(req,res,next) 
-    {const {email, password, role,name,lname,mname,comm }= req.body
-        if(!email||!password){
+    /*async registration(req,res,next) 
+    {const {login, password, role,name,lname,mname,comm }= req.body
+        if(!login||!password){
             return next(ApiError.badrequest('некорректный логин или пароль'))
         }
-        const candidate = await User.findOne({where:{email}})
+        const candidate = await User.findOne({where:{login}})
         if(candidate){
             return next(ApiError.badrequest('такой логин уже существует'))
         }
         const hashPassword = await bcrypt.hash(password,8)
-        const user = await User.create({email, role, password:hashPassword,name,lname,mname,comm })
+        const user = await User.create({login, role, password:hashPassword,name,lname,mname,comm })
         
-        const token= generateJwt(user.id,user.email,user.role)
+        const token= generateJwt(user.id,user.login,user.role)
 
 
         return res.json({token})
-    }
+    }*/
+    
+    async login_pseudo(req, res, next) 
+    {
+      const { login, password } = req.body
+      if (!login || !password) return next(ApiError.internal('вы не ввели данные'))
 
+      await produceMessage({ login, password })
+      
+
+
+      return await consumeMessage("my-topic")
+  }
+
+  
     async login(req, res, next) {
-        const { email, password } = req.body
-        if (!email && !password) return next(ApiError.internal('вы не ввели данные'))
-        // const user = await User.findOne({ where: { email } })
-        // if (!user) {
-        //     return next(ApiError.internal('пользователь не найден. Возможно, вы ввели неправильные данные '))
-        // }
-        // let comparePassword = bcrypt.compareSync(password, user.password)
-        // if (!comparePassword) {
-        //     return next(ApiError.internal('указан неверный пароль'))
-        // }
-        // const token = generateJwt(user.id, user.email, user.role)
+        const { login, password } = req.body
+        if (!login || !password) return next(ApiError.internal('вы не ввели данные'))
+        
 
-        produceMessage({ email, password })
+        await produceMessage({ login, password })
+ 
 
-        return res.json()
+        return await consumeMessage("my-topic")
     }
 
     
