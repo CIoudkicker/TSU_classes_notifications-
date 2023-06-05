@@ -1,9 +1,9 @@
-// require('dotenv').config()
 // const sequelize = require('./db')
 // const models = require('./models/model')// потом надо будет поменять на маврмодель!!!!!!!!!!!!!!!!!!!!!!!
 //const XLSX = require("xlsx")
 // const fileUpload = require('express-fileupload')
 
+require('dotenv').config()
 const express = require("express");
 
 
