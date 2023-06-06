@@ -20,4 +20,26 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_CREATE_TOPICS: "my-topic:1:1"
+      KAFKA_CREATE_TOPICS: "controller-parser-topic:1:1,parser-to-parser-topic:1:1"
+
+  controller-app:
+    build:
+      context: ./controller
+      dockerfile: Dockerfile
+    depends_on:
+      - kafka
+    ports:
+      - 5500:5500
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+
+  tsu-intime-parser:
+    build:
+      context: ./tsu_intime_parser
+      dockerfile: Dockerfile
+    depends_on:
+      - kafka
+    ports:
+      - 8000:8000
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092

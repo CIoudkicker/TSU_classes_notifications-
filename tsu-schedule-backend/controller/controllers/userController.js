@@ -4,7 +4,7 @@ const { Kafka } = require('kafkajs');
 
 const kafka = new Kafka({
   clientId: 'my-kafka-app',
-  brokers: ['localhost:29092']
+  brokers: ['kafka:9092']
 });
 
 const producer = kafka.producer();
@@ -33,17 +33,17 @@ const consumeMessage = async (topic_sub) => {
   }
 };
 
-const produceMessage = async (credentials) => {
+const produceMessage = async (data) => {
   try {
     await producer.connect();
 
     const message = {
-      key: "credentials",
-      value: JSON.stringify(credentials)
+      key: "data",
+      value: JSON.stringify(data)
     };
 
     await producer.send({
-      topic: 'my-topic',
+      topic: 'controller-parser-topic',
       messages: [message]
     });
 
@@ -73,10 +73,12 @@ class UserController {
 
 
   async getSchedule(req, res, next) {
-    const { groupNumber, faculty } = req.body
+    const groupNumber = "932209"
+    const faculty = "Институт прикладной математики и компьютерных наук"
+
     await produceMessage({ groupNumber, faculty })
 
-    return await consumeMessage("my-topic");
+    return await consumeMessage("controller-parser-topic");
   }
 
 

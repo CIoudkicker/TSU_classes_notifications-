@@ -14,7 +14,7 @@ module.exports = function (req, res, next) {
             res.status(401).json({ "message": "не авторизован" })
         }
 
-        const decoded = jwt.verify(token, process.env.JWT_KEy)
+        const decoded = jwt.verify(token, process.env.JWT_KEY)
         req.user = decoded
         next()
         console.log("Authorized")
