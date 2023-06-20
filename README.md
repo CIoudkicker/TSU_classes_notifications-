@@ -11,7 +11,7 @@ This is a Python script that extracts and saves the schedule data from the TSU A
 
 You can install the dependencies by running the following command:
 ```
-pip install requests typing datetime json transliterate
+pip install -r requirements.txt
 ```
 
 ## Usage
