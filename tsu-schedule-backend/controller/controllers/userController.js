@@ -87,7 +87,11 @@ class UserController {
     const groupNumber = "932209"
     const faculty = "Институт прикладной математики и компьютерных наук"
      try {
+<<<<<<< HEAD
    const jsonData = fs.readFileSync("E:/Magistratura/Sem2/APS/Lab4/TSU_classes_notifications-/tsu-schedule-backend/tsu_intime_parser/file.json", 'utf-8');
+=======
+   const jsonData = fs.readFileSync("../../tsu_intime_parser/file.json", 'utf-8');
+>>>>>>> 45ec07f176ad494cf5e04f185574e6eedca9b3a3
    const json = JSON.parse(jsonData);
     res.json(json);
    } catch (error) {
@@ -96,6 +100,6 @@ class UserController {
   }
   };
 
-  }
+  
 
 module.exports = new UserController()
