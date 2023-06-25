@@ -81,6 +81,22 @@ class UserController {
     return await consumeMessage("controller-parser-topic");
   }
 
+  
+ async getSchedulestat(req, res, next) {
+    const groupNumber = "932209"
+    const faculty = "Институт прикладной математики и компьютерных наук"
+     try {
+   const jsonData = fs.readFileSync(../../tsu_intime_parser/file.json, 'utf-8');
+   const json = JSON.parse(jsonData);
+    res.json(json);
+   } catch (error) {
+    console.error('Ошибка при чтении JSON файла:', error);
+    res.status(500).send('Ошибка при чтении JSON файла.');
+  }
+  });
+
+  }
+
 
 
 
