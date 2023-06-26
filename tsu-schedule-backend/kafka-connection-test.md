@@ -6,15 +6,15 @@
 2. Добавьте файл `kafka-connection-test.js`, подробности см. в файле kafka-connection-test.js.
 3. Настройте параметры подключения Kafka: 
 ```javascript
-const кафка = новая кафка({
-  clientId: 'мое-кафка-приложение',
-  Brokers: ['localhost:29092'], // Указываем адрес и порт кластера Kafka
+const kafka = new Kafka({
+ clientId: 'my-kafka-app',
+ brokers: ['localhost:29092'],, // Указываем адрес и порт кластера Kafka
 });
 ```
 4. Установите группу потребителей и тему: 
 ```javascript
-  const Consumer = kafka.consumer({groupId: 'my-consumer-group'});
-  const тема = 'моя-тема';
+ const consumer = kafka.consumer({ groupId: 'my-consumer-group' });
+ const topic = 'my-topic';
 ```
   5. Запустите `node kafka-test.js`.
   6. Получите результат:
