@@ -3,21 +3,22 @@
 ## Тестовая цель:
 Убедитесь, что архитектура приложения правильно создает и использует сообщения.
 ## Шаги теста:
-1. Предпосылка: библиотека kafkajs была установлена ​​до запуска кода (ее можно установить, запустив `npm install kafkajs`), и была запущена команда `docker-compose up --build`
-2. Добавьте файл message-production-consumption-test.js, подробности см. в файле message-production-consumption-test.js.
+1. Обязательное условие: перед запуском кода была установлена библиотека kafkajs (ее можно установить, запустив` npm install kafkajs`), и была запущена команда `docker-compose up --build`.
+2. Добавьте файл `message-production-consumption-test.js`, подробности см. в файле `message-production-consumption-test.js` и используйте клиентскую библиотеку Kafka для создания производителя в приложении Node.js.
 3. Параметры подключения кластера Kafka
 ```javascript
 const kafkaBrokers = ['localhost:29092'];
 const kafkaTopic = 'моя тема';
 ```
-4. Запустите `node message-production-consumment-test.js`
-- Создайте производителя с помощью клиентской библиотеки Kafka в приложении Node.js.
-- Отправка нескольких сообщений в указанную тему Kafka.
-- Создайте потребителя с помощью клиентской библиотеки Kafka в том же приложении Node.js.
-- Потребители получают сообщения из тем Kafka и проверяют содержание и порядок сообщений.
+4. Запустите `node message-production-consumption-test.js`, чтобы отправить несколько сообщений в указанную тему Kafka.
+5. Запустите `npm run start:consumer`, потребитель получит сообщения из темы Kafka и проверит содержимое и5порядок сообщений.
 ## Результаты теста:
+- Отправить сообщение
+![](https://huatu.98youxi.com/markdown/work/uploads/upload_3968f4d28d2880a0f7b8266c88f1b0f3.png)
 
-![](https://huatu.98youxi.com/markdown/work/uploads/upload_75b0ddf6921ac58aa1edcd5aec234a30.png)
+ - Сообщения, полученные потребителями Kafka
+ ![](https://huatu.98youxi.com/markdown/work/uploads/upload_331fb3c9ad43d7dfb678d890cf2085b5.png)
+
 
 - Приложение Node.js успешно создало производителя Kafka и смогло эффективно взаимодействовать с кластером Kafka.
 - Несколько сообщений были успешно отправлены в указанную тему Kafka и сохраняются в том порядке, в котором они были отправлены.

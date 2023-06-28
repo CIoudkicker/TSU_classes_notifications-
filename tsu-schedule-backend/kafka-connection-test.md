@@ -2,9 +2,9 @@
 ## тестовая цель
 Убедитесь, что приложение Node.js может установить подключение к кластеру Kafka в Docker.
 ## Тестовые шаги
-1. Условие: перед запуском кода была установлена ​​библиотека kafkajs (ее можно установить, запустив `npm install kafkajs`), и была запущена команда `docker-compose up --build`, а производитель `npm run start:producer` был запущен (Решение проблемы, связанной с тем, что координатор группы недоступен).
-2. Добавьте файл `kafka-connection-test.js`, подробности см. в файле kafka-connection-test.js.
-3. Настройте параметры подключения Kafka: 
+1. Необходимое условие: перед запуском кода была установлена ​​библиотека kafkajs (ее можно установить, запустив `npm install kafkajs`), и была запущена команда `docker-compose up --build`. Используйте клиентскую библиотеку Kafka в приложении Node.js для подключения к кластеру Kafka.
+2. Добавьте файл `kafka-connection-test.js`, подробности см. в файле `kafka-connection-test.js`.
+3. Настройте параметры подключения Kafka 
 ```javascript
 const kafka = new Kafka({
  clientId: 'my-kafka-app',
@@ -16,13 +16,14 @@ const kafka = new Kafka({
  const consumer = kafka.consumer({ groupId: 'my-consumer-group' });
  const topic = 'my-topic';
 ```
-  5. Запустите `node kafka-test.js`.
-  6. Получите результат:
-  - Используйте клиентскую библиотеку Kafka в приложении Node.js для подключения к кластеру Kafka.
-  - Отправить тестовое сообщение в тему Kafka.
-  - Используйте потребителя Kafka, чтобы получить сообщение и проверить его содержимое.
+5. Запустите  `node kafka-connection-test.js`, чтобы отправить тестовое сообщение в тему Kafka.
+6. Запустите `npm run start:consumer`, используйте потребитель Kafka для получения сообщения и проверки содержимого сообщения и получения результата.
   ## Результаты теста 
-  ![](https://huatu.98youxi.com/markdown/work/uploads/upload_51887c07efbc03ed00c2c1d4920ab6b9.png)
+ - Отправить сообщение
+ ![](https://huatu.98youxi.com/markdown/work/uploads/upload_49ae3397161656d0b46fe1769872d373.png)
+
+ - Сообщения, полученные потребителями Kafka
+ ![](https://huatu.98youxi.com/markdown/work/uploads/upload_29dc38165c939ccce1f03b411a28c5e7.png)
   - Приложение Node.js успешно подключается к кластеру Kafka и может установить действительную связь.
 - Тестовое сообщение было успешно отправлено в указанную тему Kafka.
 - Потребитель Kafka смог получить сообщение и убедиться, что содержание сообщения соответствует ожиданиям.
