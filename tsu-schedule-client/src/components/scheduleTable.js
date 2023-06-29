@@ -1,15 +1,24 @@
 // ScheduleTable.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Table, Button, Modal } from 'react-bootstrap';
 import scheduleData from './scheduleData';
 import { useNavigate } from 'react-router';
 
 const ScheduleTable = () => {
+	const [scheduleTableData, setScheduleData] = useState([]);
   const navigate = useNavigate();
   // Хук для отоборажения окошка с дополнительной информацией о паре
   const [show, setShow] = useState(false);
   const [lesson, setLesson] = useState(null);
-
+	useEffect(() => {
+    const fetchData = async () => {
+      const tokenToSchedule = await getToken();
+      const scheduleToTable = await showSchedule(tokenToSchedule);
+      console.log(scheduleToTable);
+      setScheduleData(scheduleToTable);
+    };
+	fetchData();
+  }, []);
   const handleClose = () => setShow(false);
 
   const handleShow = (lesson) => {
@@ -17,9 +26,37 @@ const ScheduleTable = () => {
     setShow(true);
   };
   
-  const navigateToProfile = () => {
-    navigate('/profile');
-  };
+	async function showSchedule(tokenToSchedule) {
+		let port_getSchedule = "http://localhost:5500/api/getSchedulestat";
+		let response_getSchedule = await fetch(port_getSchedule, {
+			method: 'GET',
+			headers: {
+			Authorization: `Bearer ${tokenToSchedule}` ,
+			'Content-Type': 'application/json;charset=utf-8'
+			},
+			});
+		let result_getSchedule = await response_getSchedule.json();
+		return(result_getSchedule);
+	}
+	
+	async function getToken() {
+		let port_getToken = "http://localhost:5500/api/login";
+		let data_getToken = {
+			email:"admin",
+			password:"password"
+		};
+		let response_getToken = await fetch(port_getToken, {
+			method: 'POST',
+			headers: {
+			Authorization: `Bearer ${localStorage.token}` ,
+			'Content-Type': 'application/json;charset=utf-8'
+			},
+			body: JSON.stringify(data_getToken),
+			});
+		let result_getToken = await response_getToken.json();
+		let token_getToken = result_getToken.token;
+		return(token_getToken)
+	}
 
   // Время начала и конца пар
   const timeMarks = [
@@ -38,6 +75,10 @@ const ScheduleTable = () => {
     practice: 'primary',
     meeting: 'warning',
 	laboratory: 'info'
+  };
+  
+  const navigateToProfile = async () => {
+    navigate('/profile');
   };
   
   return (
@@ -68,9 +109,10 @@ const ScheduleTable = () => {
             </thead>
             <tbody>
               {timeMarks.map((timeMark) => (
+			  
                 <tr key={timeMark.startTime}>
                   <td>{`${timeMark.startTime} - ${timeMark.endTime}`}</td>
-                  {scheduleData.map((day) => {
+                  {scheduleTableData.map((day) => {
                     const lesson = day.lessons.find((l) => l.startTime === timeMark.startTime);
                     return (
                       <td key={day.day + timeMark.startTime}>
