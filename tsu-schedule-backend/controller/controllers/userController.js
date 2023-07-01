@@ -95,8 +95,48 @@ class UserController {
     res.status(500).send('Ошибка при чтении JSON файла.');
   }
   };
-}
 
+
+async getalarmestat(req, res, next) {
+   
+
+    try {
+      const jsonData = fs.readFileSync("E:/Magistratura/Sem2/APS/Lab4/TSU_classes_notifications-/tsu-schedule-backend/tsu_intime_parser/file.json", 'utf-8');
+      const json = JSON.parse(jsonData);
+      
+      const now = moment();
+      const currentDay = now.format('dddd'); // Текущий день недели
+      const currentTime = now.format('HH:mm'); // Текущее время
+
+      const currentDaySchedule = json.find(day => day.day === currentDay);
+
+      if (!currentDaySchedule) {
+        return res.json({ message: "Сегодня пар нет" });
+      }
+
+      const nextLesson = currentDaySchedule.lessons.find(lesson => lesson.startTime >= currentTime);
+
+      if (!nextLesson) {
+        return res.json({ message: "На сегодня пары уже закончились" });
+      }
+
+      if (moment(nextLesson.startTime, 'HH:mm').diff(now, 'minutes') <= 1) {
+        return res.json({ message: "Пара начинается!", lesson: nextLesson });
+      } else {
+        return res.json({ message: "Следующая пара нескоро", nextLesson });
+      }
+    } catch (error) {
+      console.error('Ошибка при чтении JSON файла:', error);
+      return res.status(500).send('Ошибка при чтении JSON файла.');
+    }
+  }
+  
+
+
+
+
+  
+}
   
 
 module.exports = new UserController()
