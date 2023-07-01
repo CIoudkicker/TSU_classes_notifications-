@@ -121,7 +121,7 @@ async getalarmestat(req, res, next) {
       }
 
       if (moment(nextLesson.startTime, 'HH:mm').diff(now, 'minutes') <= 1) {
-        return res.json({ message: "Пара начинается!", lesson: nextLesson });
+        return res.json({ message: "Пара начинается!", lesson: nextLesson lessonLink: nextLesson.lessonLink });
       } else {
         return res.json({ message: "Следующая пара нескоро", nextLesson });
       }
