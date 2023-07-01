@@ -31,3 +31,4 @@ Make sure you have NodeJS installed on your machine.
 1. [kafka-connection-test](https://github.com/CIoudkicker/TSU_classes_notifications-/blob/test/tsu-schedule-backend/kafka-connection-test.md)   (Протестируйте соединение с Кафкой )
 2. [message-production-consumption-test](https://github.com/CIoudkicker/TSU_classes_notifications-/blob/test/tsu-schedule-backend/message-production-consumption-test.md)    (Производство и потребление тестовых сообщений)
 3. [kafka-performance-test](https://github.com/CIoudkicker/TSU_classes_notifications-/blob/test/tsu-schedule-backend/kafka-performance-test.md)     (кафка тест производительности)
+4. Kafka startup process ( процесс запуска Kafka в Docker Compose)
