@@ -8,8 +8,11 @@ def consume_from_topic(consumer, topic):
     for message in consumer:
         # Process the consumed message here
         data = json.loads(message.value.decode('utf-8'))
+        request_id = data['request_id']
+        
         schedule = parse_schedule(data)
-        forward_to_topic(schedule)
+
+        forward_to_topic(schedule, request_id)
 
 def parse_schedule(data):
     print(f"Parsing group = {data['groupNumber']} and faculty =  {data['faculty']}.")
@@ -17,8 +20,13 @@ def parse_schedule(data):
         schedule = json.load(file)
         return schedule
 
-def forward_to_topic(schedule):
-    producer.send('parser-to-parser-topic', value=json.dumps(schedule).encode('utf-8'))
+def forward_to_topic(schedule, request_id):
+    data = {
+        'schedule': schedule,
+        'request_id': request_id
+    }
+    print(data)
+    producer.send('parser-to-parser-topic', value=json.dumps(data).encode('utf-8'))
     producer.flush()
 
 

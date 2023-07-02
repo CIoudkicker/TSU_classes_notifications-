@@ -15,15 +15,19 @@ const generateJwt = (id, email) => {
   return jwt.sign({ id, email }, process.env.JWT_KEY, { expiresIn: '24h' })/* экспайрс ин, это срок годности токена, чтобы если токен украли, он устарел за этот срок*/
 }
 
-const consumeMessage = async (topic_sub) => {
+const consumeMessage = async (topic_sub, request_id) => {
   try {
     await consumer.connect();
     await consumer.subscribe({ topic: topic_sub, fromBeginning: true });
     await consumer.run({
       eachMessage: async ({ topic, partition, message }) => {
-        console.log(`Received message: ${message.value.toString()} from topic ${topic}`);
-        // Process the message as needed
-        return message;
+        const receivedMessage = message.value.toString();
+        const parsedMessage = JSON.parse(receivedMessage);
+
+        if (parsedMessage.request_id === request_id) {
+          console.log(`Received message: ${receivedMessage} from topic ${topic}`);
+          // Process the message
+        }
       },
     });
 
@@ -34,13 +38,13 @@ const consumeMessage = async (topic_sub) => {
   }
 };
 
-const produceMessage = async (data) => {
+const produceMessage = async (data, request_id)  => {
   try {
     await producer.connect();
 
     const message = {
       key: "data",
-      value: JSON.stringify(data)
+      value: JSON.stringify({...data, request_id})
     };
 
     await producer.send({
@@ -48,7 +52,7 @@ const produceMessage = async (data) => {
       messages: [message]
     });
 
-    console.log('Message sent successfully');
+    console.log(`Message sent ${JSON.stringify({...data, request_id})} successfully`);
   } catch (error) {
     console.error('Error producing message:', error);
   } finally {
@@ -76,10 +80,11 @@ class UserController {
   async getSchedule(req, res, next) {
     const groupNumber = "932209"
     const faculty = "Институт прикладной математики и компьютерных наук"
+    const request_id = Math.random().toString(36).substring(7);
 
-    await produceMessage({ groupNumber, faculty })
+    await produceMessage({ groupNumber, faculty }, request_id)
 
-    return await consumeMessage("controller-parser-topic");
+    return await consumeMessage("controller-parser-topic", request_id);
   }
 
   
