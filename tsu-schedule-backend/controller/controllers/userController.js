@@ -19,24 +19,31 @@ const consumeMessage = async (topic_sub, request_id) => {
   try {
     await consumer.connect();
     await consumer.subscribe({ topic: topic_sub, fromBeginning: true });
-    await consumer.run({
-      eachMessage: async ({ topic, partition, message }) => {
-        const receivedMessage = message.value.toString();
-        const parsedMessage = JSON.parse(receivedMessage);
 
-        if (parsedMessage.request_id === request_id) {
-          console.log(`Received message: ${receivedMessage} from topic ${topic}`);
-          // Process the message
-        }
-      },
+    return new Promise((resolve, reject) => {
+      consumer.run({
+        eachMessage: async ({ topic, partition, message }) => {
+          const receivedMessage = message.value.toString();
+          const parsedMessage = JSON.parse(receivedMessage);
+
+          if (parsedMessage.request_id === request_id) {
+            console.log(`Received message: ${receivedMessage} from topic ${topic}`);
+            const schedule = parsedMessage.schedule;
+            resolve(schedule);
+            consumer.disconnect();
+          }
+        },
+      }).catch((error) => {
+        reject(error);
+      });
     });
-
   } catch (error) {
     console.error('Error consuming message:', error);
-  } finally {
-    await consumer.disconnect();
+    throw error;
   }
 };
+
+
 
 const produceMessage = async (data, request_id)  => {
   try {
@@ -81,10 +88,17 @@ class UserController {
     const groupNumber = "932209"
     const faculty = "Институт прикладной математики и компьютерных наук"
     const request_id = Math.random().toString(36).substring(7);
+    
+    try {
+      await produceMessage({ groupNumber, faculty }, request_id)
 
-    await produceMessage({ groupNumber, faculty }, request_id)
-
-    return await consumeMessage("controller-parser-topic", request_id);
+      const schedule_json = await consumeMessage("parser-controller-topic", request_id);
+      
+      return res.json({ schedule: schedule_json });
+    } catch (error) {
+      console.error('Error:', error);
+      return res.status(500).send('An error occurred.');
+    }
   }
 
   
