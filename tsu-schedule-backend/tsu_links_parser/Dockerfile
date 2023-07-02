@@ -1,7 +1,7 @@
 FROM python:3.9
 
 # Set the working directory in the container
-WORKDIR /tsu-intime-parser
+WORKDIR /tsu-links-parser
 
 # Copy the requirements.txt file to the container
 COPY requirements.txt .

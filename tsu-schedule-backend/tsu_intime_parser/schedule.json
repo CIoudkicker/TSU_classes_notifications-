@@ -1,0 +1,127 @@
+[
+  {
+    "day": "Monday",
+    "lessons": [
+      {
+        "startTime": "14:45",
+        "endTime": "16:20",
+        "type": "lecture",
+        "title": "Информационные технологии и методология научной деятельности"
+      },
+      {
+        "startTime": "16:35",
+        "endTime": "18:10",
+        "type": "meeting",
+        "title": "Научно-исследовательская работа"
+      },
+      {
+        "startTime": "18:25",
+        "endTime": "20:00",
+        "type": "meeting",
+        "title": "Научно-исследовательская работа"
+      }
+    ]
+  },
+  {
+    "day": "Tuesday",
+    "lessons": [
+      {
+        "startTime": "12:25",
+        "endTime": "14:00",
+        "type": "lecture",
+        "title": "Математические модели массового обслуживания для экономики"
+      },
+      {
+        "startTime": "14:45",
+        "endTime": "16:20",
+        "type": "lecture",
+        "title": "Архитектура программных систем"
+      },
+      {
+        "startTime": "16:35",
+        "endTime": "18:10",
+        "type": "lecture",
+        "title": "Рефакторинг и обратное проектирование"
+      }
+    ]
+  },
+  {
+    "day": "Wednesday",
+    "lessons": [
+      {
+        "startTime": "10:35",
+        "endTime": "12:10",
+        "type": "lecture",
+        "title": "Постреляционные модели данных"
+      },
+      {
+        "startTime": "12:25",
+        "endTime": "14:00",
+        "type": "laboratory",
+        "title": "Межкультурное взаимодействие"
+      },
+      {
+        "startTime": "14:45",
+        "endTime": "16:20",
+        "type": "practice",
+        "title": "Разработка программного обеспечения и скриптовые языки"
+      },
+      {
+        "startTime": "18:25",
+        "endTime": "20:00",
+        "type": "lecture",
+        "title": "Вероятностные модели логистики"
+      }
+    ]
+  },
+  {
+    "day": "Thursday",
+    "lessons": [
+      {
+        "startTime": "12:25",
+        "endTime": "14:00",
+        "type": "practice",
+        "title": "Постреляционные модели данных"
+      },
+      {
+        "startTime": "16:35",
+        "endTime": "18:10",
+        "type": "laboratory",
+        "title": "Рефакторинг и обратное проектирование"
+      },
+      {
+        "startTime": "18:25",
+        "endTime": "20:00",
+        "type": "laboratory",
+        "title": "Введение в цифровую экономику"
+      }
+    ]
+  },
+  {
+    "day": "Friday",
+    "lessons": [
+      {
+        "startTime": "14:45",
+        "endTime": "16:20",
+        "type": "lecture",
+        "title": "Технологии виртуальной и дополненной реальности"
+      },
+      {
+        "startTime": "18:25",
+        "endTime": "20:00",
+        "type": "practice",
+        "title": "Представление знаний и визуализация данных"
+      },
+      {
+        "startTime": "20:15",
+        "endTime": "21:50",
+        "type": "lecture",
+        "title": "Интернет вещей"
+      }
+    ]
+  },
+  {
+    "day": "Saturday",
+    "lessons": []
+  }
+]
