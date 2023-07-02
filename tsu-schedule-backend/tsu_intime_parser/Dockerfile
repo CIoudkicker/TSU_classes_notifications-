@@ -16,4 +16,4 @@ COPY . .
 EXPOSE 8000
 
 # Define the command to run microservice
-CMD ["python", "main.py"]
+CMD ["python", "-u", "main.py"]

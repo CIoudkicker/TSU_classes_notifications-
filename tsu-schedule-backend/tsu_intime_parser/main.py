@@ -1,5 +1,7 @@
 import json
-from kafka import KafkaConsumer, KafkaProducer
+import time
+from kafka import KafkaConsumer, KafkaProducer, TopicPartition
+from kafka.errors import KafkaError, NoBrokersAvailable
 
 def consume_from_topic(consumer, topic):
     consumer.subscribe(topic)
@@ -34,8 +36,34 @@ if __name__ == '__main__':
         'bootstrap_servers': 'kafka:9092'
     }
 
-    # Create Kafka consumer and producer instances
-    consumer = KafkaConsumer(**consumer_config)
-    producer = KafkaProducer(**producer_config)
+    while True:
+        try:
+            # Create Kafka producer instance
+            producer = KafkaProducer(**producer_config)
+            break  # Break out of the loop if the producer is successfully created
+        except NoBrokersAvailable:
+            print("No brokers available. Retrying in 1 second...")
+            time.sleep(1)
 
-    consume_from_topic(consumer, ['controller-parser-topic'])
+    # Create Kafka consumer instance
+    consumer = KafkaConsumer(**consumer_config)
+
+    # Define the topic to consume from
+    topic = 'controller-parser-topic'
+
+    while True:
+        try:
+            # Check if the topic exists
+            partitions = consumer.partitions_for_topic(topic)
+            if partitions is not None:
+                print(f"'{topic} is available'. Subscribing...")
+                # Consume messages from the topic
+                consume_from_topic(consumer, [topic])
+            else:
+                print(f"Topic '{topic}' does not exist. Retrying in 1 second...")
+                # Add a delay of 1 second before retrying
+                time.sleep(1)
+        except KafkaError as e:
+            print(f"An error occurred: {e}. Retrying in 1 second...")
+            consumer.close()
+            time.sleep(1)
