@@ -102,62 +102,6 @@ class UserController {
       return res.status(500).send('An error occurred.');
     }
   }
-
-  
- async getSchedulestat(req, res, next) {
-    const groupNumber = "932209"
-    const faculty = "Институт прикладной математики и компьютерных наук"
-     try {
-   const jsonData = fs.readFileSync("E:/Magistratura/Sem2/APS/Lab4/TSU_classes_notifications-/tsu-schedule-backend/tsu_intime_parser/file.json", 'utf-8');
-   const json = JSON.parse(jsonData);
-    res.json(json);
-   } catch (error) {
-    console.error('Ошибка при чтении JSON файла:', error);
-    res.status(500).send('Ошибка при чтении JSON файла.');
-  }
-  };
-
-
-
-   async getalarmestat(req, res, next) {
-    const groupNumber = "932209"
-    const faculty = "Институт прикладной математики и компьютерных наук"
-
-    try {
-      await produceMessage({ groupNumber, faculty })
-      const json = await consumeMessage("controller-parser-topic");
-
-      const now = moment();
-      const currentDay = now.format('dddd'); // Текущий день недели
-      const currentTime = now.format('HH:mm'); // Текущее время
-
-      const currentDaySchedule = json.find(day => day.day === currentDay);
-
-      if (!currentDaySchedule) {
-        return res.json({ message: "Сегодня пар нет" });
-      }
-
-      const nextLesson = currentDaySchedule.lessons.find(lesson => lesson.startTime >= currentTime);
-
-      if (!nextLesson) {
-        return res.json({ message: "На сегодня пары уже закончились" });
-      }
-
-      if (moment(nextLesson.startTime, 'HH:mm').diff(now, 'minutes') <= 5) {
-        return res.json({ message: "Пара начинается через 5 минут!", lesson: nextLesson, lessonLink: nextLesson.lessonLink });
-      } else {
-        return res.json({ message: "Следующая пара нескоро", nextLesson, lessonLink: nextLesson.lessonLink });
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      return res.status(500).send('An error occurred.');
-    }
-  }
-
-
-
-
-  
 }
   
 
