@@ -4,13 +4,13 @@ import { Container, Row, Col, Table, Button, Modal } from 'react-bootstrap';
 import { useNavigate } from 'react-router';
 
 const ScheduleTable = () => {
-	const [scheduleTableData, setScheduleData] = useState([]);
-	const [notificationData, setnotificationData] = useState([]);
   const navigate = useNavigate();
   // Хук для отоборажения окошка с дополнительной информацией о паре
   const [show, setShow] = useState(false);
-  const [showNotification, setShowNotification] = useState(false);
+	const [scheduleTableData, setScheduleData] = useState([]);
   const [lesson, setLesson] = useState(null);
+	const [notificationData, setNotificationData] = useState([]);
+  const [showNotification, setShowNotification] = useState(false);
 	
   useEffect(() => {
     const fetchData = async () => {
@@ -34,7 +34,7 @@ const ScheduleTable = () => {
 
         if (data.type === 'upcoming_lesson') {
           setNotificationData(data);
-		  handleShowNotification();
+		      handleShowNotification();
         }
       });
     }
@@ -43,11 +43,6 @@ const ScheduleTable = () => {
   }, []);
 
   const handleClose = () => setShow(false);
-
-  const handleShow = (lesson) => {
-    setLesson(lesson);
-    setShow(true);
-  };
   
   const handleShow = (lesson) => {
     setLesson(lesson);

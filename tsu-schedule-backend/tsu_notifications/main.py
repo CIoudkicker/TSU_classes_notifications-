@@ -68,7 +68,8 @@ async def send_notification(websocket, schedule):
                 "startTime": next_lesson["startTime"],
                 "endTime": next_lesson["endTime"],
                 "title": next_lesson["title"],
-                "diff": time_difference
+                "diff": time_difference,
+                "type": "upcoming_lesson"
             }
             await websocket.send(json.dumps(notification, cls=CustomEncoder))
             print("Sent notification:", notification)
