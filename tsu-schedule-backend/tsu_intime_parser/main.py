@@ -41,20 +41,14 @@ def save_to_db(token, schedule):
 
     collection = db["schedule"]
 
-    documents = []
-    for lesson in schedule:
-        document = {
-            "token": token,
-            "startTime": lesson["startTime"],
-            "endTime": lesson["endTime"],
-            "type": lesson["type"],
-            "title": lesson["title"]
-        }
-        documents.append(document)
+    data = {
+        "token": token,
+        "schedule": schedule
+    }
+    
+    collection.insert_one(data)
 
-    result = collection.insert_many(documents)
-
-    print(f"Saved {len(result.inserted_ids)} documents")
+    print(f"Data saved to MongoDB successfully")
 
     # Close connection to MongoDB
     client.close()
