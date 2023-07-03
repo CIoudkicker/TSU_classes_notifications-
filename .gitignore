@@ -2,3 +2,4 @@
 /tsu-schedule-backend/controller/node_modules*
 /tsu-schedule-client/*node_modules*
 /tsu-schedule-backend/ScheduleParser/__pycache__
+/tsu-schedule-backend/data
