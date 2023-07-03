@@ -2,6 +2,8 @@ import json
 import time
 from kafka import KafkaConsumer, KafkaProducer, TopicPartition
 from kafka.errors import KafkaError, NoBrokersAvailable
+from pymongo import MongoClient
+
 
 def consume_from_topic(consumer, topic):
     consumer.subscribe(topic)
@@ -32,7 +34,31 @@ def forward_to_topic(schedule, request_id):
     producer.flush()
 
 def save_to_db(token, schedule):
-    pass
+    client = MongoClient("mongodb://localhost:27018/")
+
+    # Database name
+    db = client["TSU"]
+
+    collection = db["schedule"]
+
+    documents = []
+    for lesson in schedule:
+        document = {
+            "token": token,
+            "startTime": lesson["startTime"],
+            "endTime": lesson["endTime"],
+            "type": lesson["type"],
+            "title": lesson["title"]
+        }
+        documents.append(document)
+
+    result = collection.insert_many(documents)
+
+    print(f"Saved {len(result.inserted_ids)} documents")
+
+    # Close connection to MongoDB
+    client.close()
+
 
 if __name__ == '__main__':
     print("Starting tsu-intime-parser...")
