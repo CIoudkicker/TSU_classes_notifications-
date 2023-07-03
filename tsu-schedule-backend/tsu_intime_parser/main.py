@@ -2,17 +2,21 @@ import json
 import time
 from kafka import KafkaConsumer, KafkaProducer, TopicPartition
 from kafka.errors import KafkaError, NoBrokersAvailable
+from pymongo import MongoClient
+
 
 def consume_from_topic(consumer, topic):
     consumer.subscribe(topic)
     for message in consumer:
         # Process the consumed message here
         data = json.loads(message.value.decode('utf-8'))
-        request_id = data['request_id']
 
         schedule = parse_schedule(data)
 
+        request_id = data['request_id']
         forward_to_topic(schedule, request_id)
+
+        save_to_db(data['token'], schedule)
 
 def parse_schedule(data):
     print(f"Parsing group = {data['groupNumber']} and faculty =  {data['faculty']}.")
@@ -28,6 +32,26 @@ def forward_to_topic(schedule, request_id):
     print(data)
     producer.send('parser-to-parser-topic', value=json.dumps(data).encode('utf-8'))
     producer.flush()
+
+def save_to_db(token, schedule):
+    client = MongoClient("mongodb://mongodb:27017/")
+
+    # Database name
+    db = client["TSU"]
+
+    collection = db["schedule"]
+
+    data = {
+        "token": token,
+        "schedule": schedule
+    }
+    
+    collection.insert_one(data)
+
+    print(f"Data saved to MongoDB successfully")
+
+    # Close connection to MongoDB
+    client.close()
 
 
 if __name__ == '__main__':

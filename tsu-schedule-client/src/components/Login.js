@@ -8,13 +8,31 @@ function Login() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (username === 'admin' && password === 'password') {
-      // processing authorization
-      navigate('/schedule');
-    } else {
-      setError('Неверное имя пользователя или пароль');
+
+    try {
+      const response = await fetch('http://localhost:5500/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: username,
+          password: password,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const token = data.token;
+        localStorage.setItem('token', token); // Store the token in local storage
+        navigate('/schedule');
+      } else {
+        setError('Неверное имя пользователя или пароль');
+      }
+    } catch (error) {
+      setError('Произошла ошибка. Пожалуйста, попробуйте еще раз.');
     }
   };
 

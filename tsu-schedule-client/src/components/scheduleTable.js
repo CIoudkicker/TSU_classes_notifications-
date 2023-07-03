@@ -1,7 +1,6 @@
 // ScheduleTable.jsx
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Table, Button, Modal } from 'react-bootstrap';
-import scheduleData from './scheduleData';
 import { useNavigate } from 'react-router';
 
 const ScheduleTable = () => {
@@ -10,15 +9,39 @@ const ScheduleTable = () => {
   // Хук для отоборажения окошка с дополнительной информацией о паре
   const [show, setShow] = useState(false);
   const [lesson, setLesson] = useState(null);
-	useEffect(() => {
+	
+  useEffect(() => {
     const fetchData = async () => {
-      const tokenToSchedule = await getToken();
-      const scheduleToTable = await showSchedule(tokenToSchedule);
+      const scheduleToTable = await showSchedule();
       console.log(scheduleToTable);
       setScheduleData(scheduleToTable);
     };
-	fetchData();
+    fetchData();
+    const token = localStorage.getItem('token');
+    if (token) {
+      const socket = new WebSocket('ws://localhost:8765');
+
+      socket.addEventListener('open', () => {
+        console.log('WebSocket connection established');
+        socket.send(token);
+      });
+
+      socket.addEventListener('message', (event) => {
+        const data = JSON.parse(event.data);
+        console.log('Received message:', data);
+
+        if (data.type === 'upcoming_lesson') {
+          const lesson = data.lesson;
+
+          setLesson(lesson);
+          setShow(true);
+        }
+      });
+    }
+
+
   }, []);
+
   const handleClose = () => setShow(false);
 
   const handleShow = (lesson) => {
@@ -26,42 +49,24 @@ const ScheduleTable = () => {
     setShow(true);
   };
   
-	async function showSchedule(tokenToSchedule) {
-		let port_getSchedule = "http://localhost:5500/api/getSchedulestat";
-		let response_getSchedule = await fetch(port_getSchedule, {
-			method: 'GET',
-			headers: {
-			Authorization: `Bearer ${tokenToSchedule}` ,
-			'Content-Type': 'application/json;charset=utf-8'
-			},
-			});
-		let result_getSchedule = await response_getSchedule.json();
-		return(result_getSchedule);
-	}
-	
-	async function getToken() {
-		let port_getToken = "http://localhost:5500/api/login";
-		let data_getToken = {
-			email:"admin",
-			password:"password"
-		};
-		let response_getToken = await fetch(port_getToken, {
-			method: 'POST',
-			headers: {
-			Authorization: `Bearer ${localStorage.token}` ,
-			'Content-Type': 'application/json;charset=utf-8'
-			},
-			body: JSON.stringify(data_getToken),
-			});
-		let result_getToken = await response_getToken.json();
-		let token_getToken = result_getToken.token;
-		return(token_getToken)
-	}
+  async function showSchedule() {
+    let url = "http://localhost:5500/api/getSchedule";
+    let response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json;charset=utf-8'
+      },
+    });
+    let result = await response.json();
+    return result.schedule;
+  }
+
 
   // Время начала и конца пар
   const timeMarks = [
-    { startTime: '8:45', endTime: '10:20' },
-    { startTime: '10:35', endTime: '12:10' },
+  { startTime: '8:45', endTime: '10:20' },
+  { startTime: '10:35', endTime: '12:10' },
 	{ startTime: '12:25', endTime: '14:00' },
 	{ startTime: '14:45', endTime: '16:20' },
 	{ startTime: '16:35', endTime: '18:10' },
@@ -74,7 +79,7 @@ const ScheduleTable = () => {
     lecture: 'danger',
     practice: 'primary',
     meeting: 'warning',
-	laboratory: 'info'
+	  laboratory: 'info'
   };
   
   const navigateToProfile = async () => {
@@ -146,9 +151,5 @@ const ScheduleTable = () => {
     </Container>
   );
 };
-
-async function fillScedule (){
-	
-}
 
 export default ScheduleTable;

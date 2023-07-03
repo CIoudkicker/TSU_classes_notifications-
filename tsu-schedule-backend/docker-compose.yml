@@ -54,3 +54,18 @@ services:
       - 8001:8001
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+  
+  tsu-notifications:
+    build:
+      context: ./tsu_notifications
+      dockerfile: Dockerfile
+    ports:
+      - 8765:8765
+  
+  mongodb:
+    image: mongo
+    restart: always
+    ports:
+      - 27017:27017
+    volumes:
+      - ./data:/data/db
