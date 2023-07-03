@@ -44,14 +44,13 @@ const consumeMessage = async (topic_sub, request_id) => {
 };
 
 
-
-const produceMessage = async (data, request_id)  => {
+const produceMessage = async (data, request_id, token)  => {
   try {
     await producer.connect();
 
     const message = {
       key: "data",
-      value: JSON.stringify({...data, request_id})
+      value: JSON.stringify({...data, request_id, token})
     };
 
     await producer.send({
@@ -59,7 +58,7 @@ const produceMessage = async (data, request_id)  => {
       messages: [message]
     });
 
-    console.log(`Message sent ${JSON.stringify({...data, request_id})} successfully`);
+    console.log(`Message sent ${JSON.stringify({...data, request_id, token})} successfully`);
   } catch (error) {
     console.error('Error producing message:', error);
   } finally {
@@ -90,7 +89,10 @@ class UserController {
     const request_id = Math.random().toString(36).substring(7);
     
     try {
-      await produceMessage({ groupNumber, faculty }, request_id)
+      console.log(req.headers.authorization)
+      const token = req.headers.authorization.split(' ')[1];
+
+      await produceMessage({ groupNumber, faculty }, request_id, token)
 
       const schedule_json = await consumeMessage("parser-controller-topic", request_id);
       

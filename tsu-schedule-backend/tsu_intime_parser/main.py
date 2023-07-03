@@ -8,11 +8,13 @@ def consume_from_topic(consumer, topic):
     for message in consumer:
         # Process the consumed message here
         data = json.loads(message.value.decode('utf-8'))
-        request_id = data['request_id']
 
         schedule = parse_schedule(data)
 
+        request_id = data['request_id']
         forward_to_topic(schedule, request_id)
+
+        save_to_db(data['token'], schedule)
 
 def parse_schedule(data):
     print(f"Parsing group = {data['groupNumber']} and faculty =  {data['faculty']}.")
@@ -29,6 +31,8 @@ def forward_to_topic(schedule, request_id):
     producer.send('parser-to-parser-topic', value=json.dumps(data).encode('utf-8'))
     producer.flush()
 
+def save_to_db(token, schedule):
+    pass
 
 if __name__ == '__main__':
     print("Starting tsu-intime-parser...")
