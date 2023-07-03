@@ -5,9 +5,11 @@ import { useNavigate } from 'react-router';
 
 const ScheduleTable = () => {
 	const [scheduleTableData, setScheduleData] = useState([]);
+	const [notificationData, setnotificationData] = useState([]);
   const navigate = useNavigate();
   // Хук для отоборажения окошка с дополнительной информацией о паре
   const [show, setShow] = useState(false);
+  const [showNotification, setShowNotification] = useState(false);
   const [lesson, setLesson] = useState(null);
 	
   useEffect(() => {
@@ -31,10 +33,8 @@ const ScheduleTable = () => {
         console.log('Received message:', data);
 
         if (data.type === 'upcoming_lesson') {
-          const lesson = data.lesson;
-
-          setLesson(lesson);
-          setShow(true);
+          setNotificationData(data);
+		  handleShowNotification();
         }
       });
     }
@@ -48,6 +48,17 @@ const ScheduleTable = () => {
     setLesson(lesson);
     setShow(true);
   };
+  
+  const handleShow = (lesson) => {
+    setLesson(lesson);
+    setShow(true);
+  };
+  
+  const handleShowNotification = () => {
+    setShowNotification(true);
+  };
+  
+  const handleCloseNotification = () => setShowNotification(false);
   
   async function showSchedule() {
     let url = "http://localhost:5500/api/getSchedule";
@@ -148,6 +159,18 @@ const ScheduleTable = () => {
           </Modal.Body>
         </Modal>
       )}
+	  <Modal show={showNotification} onHide={handleCloseNotification}>
+			<Modal.Header closeButton>
+			  <Modal.Title>Notification</Modal.Title>
+			</Modal.Header>
+			<Modal.Body>
+			  <p>Пара скоро начнется</p>
+			  <p>Пара: {notificationData.title}</p>
+			  <p>Время начала: {notificationData.startTime}</p>
+			  <p>Время конца: {notificationData.endTime}</p>
+			  <p>Времени осталось: {notificationData.diff}</p>
+			</Modal.Body>
+		  </Modal>
     </Container>
   );
 };
