@@ -34,7 +34,7 @@ def forward_to_topic(schedule, request_id):
     producer.flush()
 
 def save_to_db(token, schedule):
-    client = MongoClient("mongodb://localhost:27018/")
+    client = MongoClient("mongodb://mongodb:27017/")
 
     # Database name
     db = client["TSU"]
