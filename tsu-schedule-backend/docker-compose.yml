@@ -54,3 +54,19 @@ services:
       - 8001:8001
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+  
+  mongodb:
+    image: mongo
+    restart: always
+    ports:
+      - 27017:27017
+    volumes:
+      - ./data:/data/db
+
+  python-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    depends_on:
+      - mongodb
