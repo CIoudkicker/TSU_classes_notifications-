@@ -62,11 +62,3 @@ services:
       - 27017:27017
     volumes:
       - ./data:/data/db
-
-  python-app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    restart: always
-    depends_on:
-      - mongodb
