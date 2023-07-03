@@ -8,5 +8,5 @@ const authMiddleware = require('../middleware/authMiddleware')
 router.post('/login', userController.login)
 router.get('/getSchedule', authMiddleware ,userController.getSchedule)
 router.get('/getSchedulestat', authMiddleware ,userController.getSchedulestat)
-
+router.get('/getalarmestat', authMiddleware ,userController.getalarmestat)
 module.exports = router

@@ -15,32 +15,43 @@ const generateJwt = (id, email) => {
   return jwt.sign({ id, email }, process.env.JWT_KEY, { expiresIn: '24h' })/* экспайрс ин, это срок годности токена, чтобы если токен украли, он устарел за этот срок*/
 }
 
-const consumeMessage = async (topic_sub) => {
+const consumeMessage = async (topic_sub, request_id) => {
   try {
     await consumer.connect();
     await consumer.subscribe({ topic: topic_sub, fromBeginning: true });
-    await consumer.run({
-      eachMessage: async ({ topic, partition, message }) => {
-        console.log(`Received message: ${message.value.toString()} from topic ${topic}`);
-        // Process the message as needed
-        return message;
-      },
-    });
 
+    return new Promise((resolve, reject) => {
+      consumer.run({
+        eachMessage: async ({ topic, partition, message }) => {
+          const receivedMessage = message.value.toString();
+          const parsedMessage = JSON.parse(receivedMessage);
+
+          if (parsedMessage.request_id === request_id) {
+            console.log(`Received message: ${receivedMessage} from topic ${topic}`);
+            const schedule = parsedMessage.schedule;
+            resolve(schedule);
+            consumer.disconnect();
+          }
+        },
+      }).catch((error) => {
+        reject(error);
+      });
+    });
   } catch (error) {
     console.error('Error consuming message:', error);
-  } finally {
-    await consumer.disconnect();
+    throw error;
   }
 };
 
-const produceMessage = async (data) => {
+
+
+const produceMessage = async (data, request_id)  => {
   try {
     await producer.connect();
 
     const message = {
       key: "data",
-      value: JSON.stringify(data)
+      value: JSON.stringify({...data, request_id})
     };
 
     await producer.send({
@@ -48,7 +59,7 @@ const produceMessage = async (data) => {
       messages: [message]
     });
 
-    console.log('Message sent successfully');
+    console.log(`Message sent ${JSON.stringify({...data, request_id})} successfully`);
   } catch (error) {
     console.error('Error producing message:', error);
   } finally {
@@ -76,10 +87,18 @@ class UserController {
   async getSchedule(req, res, next) {
     const groupNumber = "932209"
     const faculty = "Институт прикладной математики и компьютерных наук"
+    const request_id = Math.random().toString(36).substring(7);
+    
+    try {
+      await produceMessage({ groupNumber, faculty }, request_id)
 
-    await produceMessage({ groupNumber, faculty })
-
-    return await consumeMessage("controller-parser-topic");
+      const schedule_json = await consumeMessage("parser-controller-topic", request_id);
+      
+      return res.json({ schedule: schedule_json });
+    } catch (error) {
+      console.error('Error:', error);
+      return res.status(500).send('An error occurred.');
+    }
   }
 
   
@@ -87,11 +106,7 @@ class UserController {
     const groupNumber = "932209"
     const faculty = "Институт прикладной математики и компьютерных наук"
      try {
-<<<<<<< HEAD
    const jsonData = fs.readFileSync("E:/Magistratura/Sem2/APS/Lab4/TSU_classes_notifications-/tsu-schedule-backend/tsu_intime_parser/file.json", 'utf-8');
-=======
-   const jsonData = fs.readFileSync("../../tsu_intime_parser/file.json", 'utf-8');
->>>>>>> 45ec07f176ad494cf5e04f185574e6eedca9b3a3
    const json = JSON.parse(jsonData);
     res.json(json);
    } catch (error) {
@@ -100,6 +115,48 @@ class UserController {
   }
   };
 
+
+
+   async getalarmestat(req, res, next) {
+    const groupNumber = "932209"
+    const faculty = "Институт прикладной математики и компьютерных наук"
+
+    try {
+      await produceMessage({ groupNumber, faculty })
+      const json = await consumeMessage("controller-parser-topic");
+
+      const now = moment();
+      const currentDay = now.format('dddd'); // Текущий день недели
+      const currentTime = now.format('HH:mm'); // Текущее время
+
+      const currentDaySchedule = json.find(day => day.day === currentDay);
+
+      if (!currentDaySchedule) {
+        return res.json({ message: "Сегодня пар нет" });
+      }
+
+      const nextLesson = currentDaySchedule.lessons.find(lesson => lesson.startTime >= currentTime);
+
+      if (!nextLesson) {
+        return res.json({ message: "На сегодня пары уже закончились" });
+      }
+
+      if (moment(nextLesson.startTime, 'HH:mm').diff(now, 'minutes') <= 5) {
+        return res.json({ message: "Пара начинается через 5 минут!", lesson: nextLesson, lessonLink: nextLesson.lessonLink });
+      } else {
+        return res.json({ message: "Следующая пара нескоро", nextLesson, lessonLink: nextLesson.lessonLink });
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      return res.status(500).send('An error occurred.');
+    }
+  }
+
+
+
+
+  
+}
   
 
 module.exports = new UserController()
